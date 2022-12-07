@@ -19,3 +19,7 @@ func NewZoneFile(fileName string) *ZoneFile {
 func (zoneFile *ZoneFile) writeFile(content string) (err error) {
 	return os.WriteFile(zoneFile.zoneFileFullName, []byte(content), zoneFilePerm)
 }
+
+func (zoneFile *ZoneFile) readFile() ([]byte, error) {
+	return os.ReadFile(zoneFile.zoneFileFullName)
+}

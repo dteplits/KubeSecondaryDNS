@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/net"
@@ -55,8 +56,31 @@ func (zoneFileCache *ZoneFileCache) prepare() {
 	zoneFileCache.generateHeaderSuffix()
 	zoneFileCache.soaSerial = 0
 	zoneFileCache.header = zoneFileCache.generateHeader()
-	zoneFileCache.content = zoneFileCache.header
 	zoneFileCache.vmiRecordsMap = make(map[string][]string)
+}
+
+func (zoneFileCache *ZoneFileCache) updateIfAlreadyExist(content []byte) {
+	if prevSoaSerial := fetchSoaSerial(content); prevSoaSerial > 0 {
+		zoneFileCache.soaSerial = prevSoaSerial + 1
+		zoneFileCache.header = zoneFileCache.generateHeader()
+	}
+}
+
+func fetchSoaSerial(content []byte) int {
+	contentStr := string(content)
+	var ind1, ind2 int
+	if ind1 = strings.Index(contentStr, "("); ind1 == 0 {
+		return 0
+	}
+	if ind2 = strings.Index(contentStr[ind1:], " "); ind2 == 0 {
+		return 0
+	}
+	soaSerial := strings.TrimSpace(contentStr[ind1+1 : ind1+ind2])
+	if soaSerialInt, err := strconv.Atoi(soaSerial); err != nil {
+		return 0
+	} else {
+		return soaSerialInt
+	}
 }
 
 func (zoneFileCache *ZoneFileCache) initCustomFields() {
