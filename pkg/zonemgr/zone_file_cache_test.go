@@ -25,6 +25,7 @@ var _ = Describe("cached zone file content maintenance", func() {
 		const (
 			headerDefault   = "$ORIGIN vm. \n$TTL 3600 \n@ IN SOA ns.vm. email.vm. (0 3600 3600 1209600 3600)\n"
 			headerCustomFmt = "$ORIGIN vm.%s. \n$TTL 3600 \n@ IN SOA ns.vm.%s. email.vm.%s. (0 3600 3600 1209600 3600)\nIN NS ns.vm.%s.\nIN A %s\n"
+			content         = "$ORIGIN vm. \n$TTL 3600 \n@ IN SOA ns.vm. email.vm. (12345 3600 3600 1209600 3600)\n"
 		)
 
 		var (
@@ -38,6 +39,11 @@ var _ = Describe("cached zone file content maintenance", func() {
 			Entry("header should contain default values", "", "", headerDefault),
 			Entry("header should contain custom values", nameServerIP, domain, headerCustom),
 		)
+
+		It("should update SOA serial based on existing value", func() {
+			zoneFileCache.updateIfAlreadyExist([]byte(content))
+			Expect(zoneFileCache.soaSerial).To(Equal(12346))
+		})
 	})
 
 	Describe("cached zone file records update", func() {

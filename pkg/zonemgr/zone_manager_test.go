@@ -41,11 +41,5 @@ var _ = Describe("Zone Manager functionality", func() {
 		It("should create zone file with correct name", func() {
 			Expect(zoneMgr.zoneFile.zoneFileFullName).To(Equal("/zones/db.vm." + customDomain))
 		})
-
-		When("zone file already exist", func() {
-			It("should update cached SOA serial value", func() {
-				//TODO
-			})
-		})
 	})
 })

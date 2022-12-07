@@ -52,5 +52,11 @@ var _ = Describe("disk zone file maintenance", func() {
 		It("should override a zone file on disk", func() {
 			testFileFunc(zoneFileUpdatedContent)
 		})
+
+		It("should read zone file from disk", func() {
+			content, err := zoneFile.readFile()
+			Expect(err).To(BeNil())
+			Expect(string(content)).To(Equal(zoneFileContent))
+		})
 	})
 })
